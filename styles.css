@@ -679,4 +679,43 @@ body.character-page .panel-right .panel-body {
   .gutter-scroller{
     display: none;
   }
+
+  /* Character pages: don’t pin the whole header on mobile */
+  body.character-page .topbar {
+    position: static; /* overrides sticky */
+  }
+
+  /* Trim header vertical footprint */
+  body.character-page .topbar .container {
+    padding: 12px 16px;
+  }
+
+  body.character-page .hero {
+    padding: 8px 0 6px;
+  }
+
+  body.character-page .hero h1 {
+    margin: 10px 0 4px;
+    font-size: 30px;
+  }
+
+  body.character-page .hero .slogan {
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  /* Mobile stack + order: Cards, Win/Unique, Background */
+  body.character-page .character-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+  body.character-page .panel-left  { order: 1; } /* Cards */
+  body.character-page .panel-right { order: 2; } /* Win/Unique */
+  body.character-page .panel-center{ order: 3; } /* Background */
+
+  /* Optional: tighten nav on mobile */
+  body.character-page .nav { gap: 8px; }
+  body.character-page .nav a { padding: 6px 10px; font-size: 13px; }
 }
+
