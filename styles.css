@@ -227,6 +227,44 @@ a:hover { text-decoration: underline; }
 }
 
 /* =========================
+   Special Chip: Rainbow CTA
+========================= */
+
+.chip.chip-cta {
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255, 211, 110, 0.28),
+      rgba(124, 92, 255, 0.24),
+      rgba(0, 212, 255, 0.22),
+      rgba(255, 79, 216, 0.26)
+    );
+  border-color: rgba(255, 211, 110, 0.45);
+  color: rgba(255,255,255,0.98);
+
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255, 211, 110, 0.25) inset;
+
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.chip.chip-cta:hover {
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255, 211, 110, 0.40),
+      rgba(124, 92, 255, 0.34),
+      rgba(0, 212, 255, 0.32),
+      rgba(255, 79, 216, 0.36)
+    );
+  border-color: rgba(255, 211, 110, 0.70);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* =========================
    World Index: Tile Grid
 ========================= */
 
@@ -719,3 +757,93 @@ body.character-page .panel-right .panel-body {
   body.character-page .nav a { padding: 6px 10px; font-size: 13px; }
 }
 
+/* =========================
+   Tutorial carousel
+========================= */
+.tutorial-frame{
+  position: relative;
+  margin-top: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--stroke2);
+  background: rgba(255,255,255,0.03);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+  overflow: hidden;
+  user-select: none;
+  touch-action: pan-y; /* allow vertical scroll, we handle horizontal swipe */
+}
+
+.tutorial-img{
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 68vh;
+  object-fit: contain;
+  background: rgba(0,0,0,0.18);
+}
+
+.tutorial-nav{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  font-size: 26px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  z-index: 2;
+}
+
+.tutorial-nav:hover{
+  background: rgba(255,255,255,0.12);
+  border-color: var(--stroke);
+  transform: translateY(-50%) scale(1.03);
+}
+
+.tutorial-prev{ left: 10px; }
+.tutorial-next{ right: 10px; }
+
+/* Small hint overlay */
+.tutorial-hint{
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke2);
+  background: rgba(10,12,24,0.55);
+  font-size: 12px;
+  color: var(--muted);
+  z-index: 2;
+}
+
+.tutorial-meta{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tutorial-counter{
+  font-size: 13px;
+  color: var(--muted);
+  border: 1px solid var(--stroke2);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.04);
+}
+
+.tutorial-dots{
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  just

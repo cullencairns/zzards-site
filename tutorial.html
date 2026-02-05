@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zzards — Tutorial</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a href="./index.html">Home</a>
+        <a href="./world.html">The World of Zzards</a>
+        <a href="./characters.html">Characters</a>
+        <a href="./cards.html">Cards</a>
+        <a href="./community.html">Community</a>
+        <a href="./zzardmarks.html">Zzardmarks</a>
+      </nav>
+
+      <div class="hero">
+        <h1>Zzards</h1>
+        <p class="slogan">A tactical card game in a topsy turvy world.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel panel-center">
+      <div class="panel-head">How To Survive</div>
+      <div class="panel-body">
+
+        <div class="section tutorial" aria-label="Tutorial">
+          <h3>Round Overview</h3>
+
+          <div class="tutorial-frame" id="tutorialFrame">
+            <button class="tutorial-nav tutorial-prev" id="tutPrev" type="button" aria-label="Previous tutorial page">
+              ‹
+            </button>
+
+            <img
+              id="tutImg"
+              class="tutorial-img"
+              src="./assets/tutorial/tut_1.png"
+              alt="Tutorial page 1"
+              draggable="false"
+              loading="eager"
+            />
+
+            <button class="tutorial-nav tutorial-next" id="tutNext" type="button" aria-label="Next tutorial page">
+              ›
+            </button>
+          </div>
+
+          <div class="tutorial-meta">
+            <span class="tutorial-counter" id="tutCounter">1 / ?</span>
+            <div class="tutorial-dots" id="tutDots" aria-hidden="true"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    // ===== Configure your tutorial here =====
+    const BASE_PATH = "./assets/tutorial/";
+    const PREFIX = "tut_";
+    const EXT = ".png";
+
+    // If you know how many images you have, set it here (recommended).
+    // Example: tut_1.png ... tut_12.png  => 12
+    const TUT_COUNT = null; // e.g. 12, or leave null to auto-probe (slightly slower)
+
+    const imgEl = document.getElementById("tutImg");
+    const frameEl = document.getElementById("tutorialFrame");
+    const prevBtn = document.getElementById("tutPrev");
+    const nextBtn = document.getElementById("tutNext");
+    const counterEl = document.getElementById("tutCounter");
+    const dotsEl = document.getElementById("tutDots");
+
+    if (!imgEl || !frameEl || !prevBtn || !nextBtn || !counterEl) return;
+
+    let index = 1;
+    let maxIndex = TUT_COUNT; // may stay null if auto-probing
+
+    function srcFor(i){
+      return `${BASE_PATH}${PREFIX}${i}${EXT}`;
+    }
+
+    function clampIndex(i){
+      if (maxIndex != null) {
+        if (i < 1) i = 1;
+        if (i > maxIndex) i = maxIndex;
+        return i;
+      }
+      // If unknown, allow moving forward; actual load will decide.
+      if (i < 1) i = 1;
+      return i;
+    }
+
+    function renderDots(){
+      if (!dotsEl) return;
+      dotsEl.innerHTML = "";
+      if (maxIndex == null) return; // hide dots if we don't know total
+      const count = Math.min(maxIndex, 24); // keep it sane if you have tons
+      for (let i = 1; i <= count; i++){
+        const d = document.createElement("span");
+        d.className = "tutorial-dot" + (i === index ? " is-active" : "");
+        dotsEl.appendChild(d);
+      }
+    }
+
+    function renderCounter(){
+      counterEl.textContent = maxIndex == null ? `${index} / ?` : `${index} / ${maxIndex}`;
+    }
+
+    function setImage(i){
+      i = clampIndex(i);
+
+      // Preload the candidate
+      const test = new Image();
+      test.onload = () => {
+        index = i;
+        imgEl.src = test.src;
+        imgEl.alt = `Tutorial page ${index}`;
+        renderCounter();
+        renderDots();
+      };
+      test.onerror = () => {
+        // If we were auto-probing and next image doesn't exist, lock maxIndex.
+        if (maxIndex == null && i > index) {
+          maxIndex = index; // we just discovered the end
+          renderCounter();
+          renderDots();
+        }
+        // Otherwise ignore (don’t move).
+      };
+      test.src = srcFor(i);
+    }
+
+    function next(){ setImage(index + 1); }
+    function prev(){ setImage(index - 1); }
+
+    // Buttons
+    prevBtn.addEventListener("click", prev);
+    nextBtn.addEventListener("click", next);
+
+    // Click/tap left/right side of image/frame
+    frameEl.addEventListener("click", (e) => {
+      // Avoid double-trigger when clicking the buttons
+      const target = e.target;
+      if (target === prevBtn || target === nextBtn) return;
+
+      const rect = frameEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const isLeft = x < rect.width / 2;
+      if (isLeft) prev();
+      else next();
+    });
+
+    // Keyboard arrows (when user is on the page)
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    });
+
+    // Swipe support
+    let touchStartX = null;
+    let touchStartY = null;
+
+    frameEl.addEventListener("touchstart", (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    frameEl.addEventListener("touchend", (e) => {
+      if (touchStartX == null || touchStartY == null) return;
+      const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
+      if (!t) return;
+
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+
+      // Horizontal swipe threshold; ignore if mostly vertical (so scrolling still works)
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (dx < 0) next();
+        else prev();
+      }
+
+      touchStartX = null;
+      touchStartY = null;
+    }, { passive: true });
+
+    // If auto-probing, try to discover total quickly (optional)
+    async function probeMax(limit = 60){
+      // tries 1..limit until failure
+      for (let i = 1; i <= limit; i++){
+        // eslint-disable-next-line no-await-in-loop
+        const ok = await new Promise((resolve) => {
+          const im = new Image();
+          im.onload = () => resolve(true);
+          im.onerror = () => resolve(false);
+          im.src = srcFor(i);
+        });
+        if (!ok) return i - 1;
+      }
+      return limit;
+    }
+
+    (async () => {
+      if (maxIndex == null) {
+        const found = await probeMax(80); // bump if you have more than 80
+        if (found >= 1) maxIndex = found;
+      }
+      renderCounter();
+      renderDots();
+      setImage(1);
+    })();
+  })();
+  </script>
+  <script src="./tutorial.js"></script>
+</body>
+</html>
